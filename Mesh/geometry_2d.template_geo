@@ -1,0 +1,84 @@
+DefineConstant[
+length = {22, Name "Channel length"}
+front_distance = {2, Name "Cylinder center distance to inlet"}
+bottom_distance = {2, Name "Cylinder center distance from bottom"}
+width = {4.1, Name "Channel width"}
+square_length = {1, Name "Square side length"}
+cylinder_size = {0.2, Name "Mesh size on cylinder"}
+box_size = {0.5, Name "Mesh size on wall"}
+coarse_size = {1, Name "Mesh size close to the outflow"}
+coarse_distance = {5, Name "Distance from the cylinder where coarsening starts"}
+];
+
+// Seed the cylinder
+
+p = newp;
+Point(p) = {-square_length/2, -square_length/2, 0, cylinder_size};
+Point(p+1) = {-square_length/2, +square_length/2, 0, cylinder_size};
+Point(p+2) = {+square_length/2, +square_length/2, 0, cylinder_size};
+Point(p+3) = {+square_length/2, -square_length/2, 0, cylinder_size};
+
+l = newl;
+Line(l) = {p, p+1};
+Line(l+1) = {p+1, p+2};
+Line(l+2) = {p+2, p+3};
+Line(l+3) = {p+3, p};
+
+cylinder[] = {l, l+1, l+2, l+3};
+Physical Line(4) = {cylinder[]};
+
+// The chanel
+p = newp;
+Point(p) = {-front_distance, -bottom_distance, 0, box_size};
+Point(p+1) = {square_length+coarse_distance, -bottom_distance, 0, coarse_size};
+Point(p+2) = {-front_distance+length, -bottom_distance, 0, coarse_size};
+Point(p+5) = {-front_distance, -bottom_distance+width, 0, box_size};
+Point(p+4) = {square_length+coarse_distance, -bottom_distance+width, 0, coarse_size};
+Point(p+3) = {-front_distance+length, -bottom_distance+width, 0, coarse_size};
+
+l = newl;
+// A no slip wall
+Line(l) = {p, p+1};
+Line(l+1) = {p+1, p+2};
+Physical Line(1) = {l, l+1};
+
+// Outflow
+Line(l+2) = {p+2, p+3};
+Physical Line(2) = {l+2};
+
+// Top no slip wall
+Line(l+3) = {p+3, p+4};
+Line(l+4) = {p+4, p+5};
+Physical Line(1) += {l+3, l+4};
+
+// Inlet
+Line(l+5) = {p+5, p};
+Physical Line(3) = {l+5};
+
+// Coarse line
+Line(l+6) = {p+1, p+4};
+
+coarse = newll;
+Line Loop(coarse) = {(l+1), (l+2), (l+3), -(l+6)};
+
+s = news;
+Plane Surface(s) = {coarse};
+Physical Surface(1) = {s};
+
+// The one with cylinder 
+cframe[] = {l, (l+6), l+4, l+5};
+
+// // The surface to be mesh;
+outer = newll;
+Line Loop(outer) = {cframe[]};
+
+inner = newll;
+Line Loop(inner) = {cylinder[]};
+
+s = news;
+Plane Surface(s) = {inner, outer};
+Physical Surface(1) += {s};
+
+//Characteristic Length{cylinder[]} = cylinder_size;
+//Characteristic Length{coarse[]} = coarse_size;
+//Characteristic Length{cframe[]} = box_size;
