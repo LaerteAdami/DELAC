@@ -1,2 +1,4 @@
-gmsh
-turtleFSI
+gmsh~=4.11.1
+turtleFSI~=1.5
+numpy~=1.24.3
+dolfin
