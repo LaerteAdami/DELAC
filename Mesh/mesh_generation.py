@@ -1,42 +1,39 @@
 import os
 import subprocess
 
-args = {'width': 4.1,
-        'box_size': 0.5,
-        'length': 22,
-        'bottom_distance': 2,
-        'cylinder_size': 0.2,
-        'front_distance': 2,
-        'coarse_distance': 5,
-        'coarse_size': 1}
 
-template = 'geometry_2d.template_geo'
-'''Modify template according args and make gmsh generate the mesh'''
-assert os.path.exists(template)
+def generate_mesh(args, template):
 
-with open(template, 'r') as f:
-    old = f.readlines()
+    output = template
 
-output = template
+    cmd = 'gmsh -0 %s ' % output
 
-cmd = 'gmsh -0 %s ' % output
+    list_geometric_parameters = ['width', 'box_size', 'length',
+                                 'bottom_distance', 'cylinder_size', 'front_distance',
+                                 'outer_length', 'coarse_size']
 
-list_geometric_parameters = ['width', 'box_size', 'length',
-                             'bottom_distance', 'cylinder_size', 'front_distance',
-                             'coarse_distance', 'coarse_size']
+    constants = " "
 
-constants = " "
+    for crrt_param in list_geometric_parameters:
+        constants = constants + " -setnumber " + crrt_param + " " + str(args[crrt_param])
 
-for crrt_param in list_geometric_parameters:
-    constants = constants + " -setnumber " + crrt_param + " " + str(args[crrt_param])
+    print(constants)
+    # Unrolled model
+    subprocess.call(cmd + constants, shell=True)
 
-print(constants)
-# Unrolled model
-subprocess.call(cmd + constants, shell=True)
+    unrolled = '../Mesh/geometry_2d.geo_unrolled'
 
-unrolled = 'geometry_2d.geo_unrolled'
+    dim = 2
+    scale = 1
 
-dim = 2
-scale = 1
+    # Create the mesh
+    subprocess.call(['gmsh -format msh2 -%d -clscale %g %s' % (dim, scale, unrolled)], shell=True)
 
-subprocess.call(['gmsh -%d -clscale %g %s' % (dim, scale, unrolled)], shell=True)
+    mesh_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "geometry_2d.msh")
+
+    root, _ = os.path.splitext(mesh_path)
+
+    # Get the xml mesh
+    xml_file = '.'.join([root, 'xml'])
+    subprocess.call(['dolfin-convert %s %s' % (mesh_path, xml_file)], shell=True)
+
