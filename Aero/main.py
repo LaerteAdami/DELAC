@@ -13,7 +13,7 @@ args_mesh = {'width': 5,
 
 template_mesh = '../Mesh/geometry_2d.template_geo'
 
-mesh_flag = False  # True is create the mesh from scratch
+mesh_flag = True  # True is create the mesh from scratch
 
 if mesh_flag:
     # Create the mesh
@@ -23,4 +23,4 @@ if mesh_flag:
     # subprocess.call("gmsh %s" % "geometry_2d.msh")
 
 # Aero simulation
-subprocess.call("turtleFSI --problem aero_demo", shell=True)
+# subprocess.call("turtleFSI --problem aero_demo", shell=True)

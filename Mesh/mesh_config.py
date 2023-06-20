@@ -5,11 +5,6 @@
 # - square: side length, center
 # - polygon: vertices
 
-import gmsh
-import sys
-import os, subprocess
-
-
 args = {'width': 4,
         'length': 22,
         'bottom_distance': 2,
@@ -21,4 +16,3 @@ args = {'width': 4,
         'coarse_size': 0.5}
 
 
-# subprocess.call("turtleFSI --problem aero_demo", shell=True)

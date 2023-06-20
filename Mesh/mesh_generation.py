@@ -36,3 +36,4 @@ def generate_mesh(args, template):
     # Get the xml mesh
     xml_file = '.'.join([root, 'xml'])
     subprocess.call(['dolfin-convert %s %s' % (mesh_path, xml_file)], shell=True)
+

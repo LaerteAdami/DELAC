@@ -82,7 +82,7 @@ def get_mesh_domain_and_boundaries(L, **namespace):
     domains.set_all(1)
 
     # Save file with boundary labels
-    File("../Mesh/test_boundaries.pvd").write(boundaries)
+    # File("../Mesh/test_boundaries.pvd").write(boundaries)
 
     return mesh, domains, boundaries
 
