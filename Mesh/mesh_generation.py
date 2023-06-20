@@ -10,7 +10,7 @@ def generate_mesh(args, template):
 
     list_geometric_parameters = ['width', 'box_size', 'length',
                                  'bottom_distance', 'cylinder_size', 'front_distance',
-                                 'coarse_distance', 'coarse_size']
+                                 'outer_length', 'coarse_size']
 
     constants = " "
 
@@ -21,7 +21,7 @@ def generate_mesh(args, template):
     # Unrolled model
     subprocess.call(cmd + constants, shell=True)
 
-    unrolled = 'geometry_2d.geo_unrolled'
+    unrolled = '../Mesh/geometry_2d.geo_unrolled'
 
     dim = 2
     scale = 1

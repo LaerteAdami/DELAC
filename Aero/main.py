@@ -1,17 +1,17 @@
 from Mesh.mesh_generation import generate_mesh
 import subprocess
 
-args_mesh = {'width': 4,
-             'length': 22,
-             'bottom_distance': 2,
-             'front_distance': 2,
-             'coarse_distance': 5,
+args_mesh = {'width': 5,
+             'length': 15,
+             'bottom_distance': 2.5,
+             'front_distance': 3,
+             'outer_length': 30,
              # Size of the mesh
-             'cylinder_size': 0.05,
-             'box_size': 0.2,
-             'coarse_size': 0.5}
+             'cylinder_size': 0.1,
+             'box_size': 0.5,
+             'coarse_size': 1}
 
-template_mesh = 'geometry_2d.template_geo'
+template_mesh = '../Mesh/geometry_2d.template_geo'
 
 mesh_flag = False  # True is create the mesh from scratch
 

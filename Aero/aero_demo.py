@@ -6,6 +6,7 @@ from dolfin import *
 from os import path
 from turtleFSI.problems import *
 from turtleFSI.modules import *
+import numpy as np
 
 parameters["ghost_mode"] = "shared_facet"
 
@@ -16,9 +17,9 @@ parameters["ghost_mode"] = "shared_facet"
 def set_problem_parameters(default_variables, **namespace):
     # Overwrite or add new variables to 'default_variables'
     s = 1  # Side length [m]
-    Re = 100  # Reynolds number [-]
+    Re = 120  # Reynolds number [-]
     u_inf = 1.0  # Free-stream flow velocity in [m/s]
-    rho_f = 1  # Fluid density [kg/m^3]
+    rho_f = 1.225  # Fluid density [kg/m^3]
     mu_f = rho_f * u_inf * s / Re  # Fluid dynamic viscosity [Pa.s]
 
     default_variables.update(dict(
@@ -29,14 +30,14 @@ def set_problem_parameters(default_variables, **namespace):
         b_dist=2,  # distance from the bottom wall
         H=4,  # Total height
         R=1,  # Radius of the circle
-        L=22,  # Length of domain
+        L=30,  # Length of domain
         c_x=0,  # Center of the circle x-direction
         c_y=0,  # Center of the circle y-direction
 
         # Temporal variables
-        T=1,  # End time [s]
+        T=100,  # End time [s]
         dt=0.1,  # Time step [s]
-        theta=0.51,  # Temporal scheme
+        theta=0.5,  # Temporal scheme: second-order Crank-Nicolson scheme
 
         # Physical constants ('FSI 3')
         u_inf=u_inf,  # Inlet velocity: 1.0 [m/s]
@@ -45,9 +46,9 @@ def set_problem_parameters(default_variables, **namespace):
         mu_f=mu_f,  # Fluid dynamic viscosity [Pa.s]
 
         # Problem specific
-        folder="Results/aero_demo4_results",  # Name of the results folder
+        folder="Results/aero_delta1_Re120_T100_results",  # Name of the results folder
         solid="no_solid",  # Do not solve for the solid
-        extrapolation="no_extrapolation",  # No displacement to extrapolate  # No displacement to extrapolate
+        extrapolation="no_extrapolation",  # No displacement to extrapolate
 
         # Solver settings
         recompute=1  # Compute the Jacobian matrix every iteration
@@ -57,15 +58,15 @@ def set_problem_parameters(default_variables, **namespace):
     return default_variables
 
 
-def get_mesh_domain_and_boundaries(H, L, f_dist, **namespace):
+def get_mesh_domain_and_boundaries(L, **namespace):
     # Read mesh
     xml_file = path.join(path.dirname(path.abspath(__file__)), "../Mesh", "geometry_2d.xml")
     mesh = Mesh(xml_file)
 
     # Define boundaries
-    Inlet = AutoSubDomain(lambda x: near(x[0], -f_dist))
-    Outlet = AutoSubDomain(lambda x: (near(x[0], (L - f_dist))))
-    Walls = AutoSubDomain(lambda x: (x[1] >= H / 2) or (x[1] <= -H / 2))
+    Inlet = AutoSubDomain(lambda x: near(x[0], -L / 2))
+    Outlet = AutoSubDomain(lambda x: (near(x[0], +L / 2)))
+    Walls = AutoSubDomain(lambda x: (x[1] >= L / 2) or (x[1] <= -L / 2))
 
     # Mark the boundaries
     All_boundaries = DomainBoundary()
@@ -81,21 +82,20 @@ def get_mesh_domain_and_boundaries(H, L, f_dist, **namespace):
     domains.set_all(1)
 
     # Save file with boundary labels
-    File("Mesh/test_boundaries.pvd").write(boundaries)
+    File("../Mesh/test_boundaries.pvd").write(boundaries)
 
     return mesh, domains, boundaries
 
 
-def initiate(c_x, c_y, R, f_dist, **namespace):
+def initiate(**namespace):
     # Coordinate for sampling statistics
-    coord = [c_x + R + f_dist, c_y]
+    # coord = [c_x + R + f_dist, c_y]
 
     # Lists to hold displacement, forces, and time
     drag_list = []
-    lift_list = []
     time_list = []
 
-    return dict(drag_list=drag_list, lift_list=lift_list, time_list=time_list)
+    return dict(drag_list=drag_list, time_list=time_list)
 
 
 def create_bcs(DVP, u_inf, boundaries, **namespace):
@@ -111,7 +111,7 @@ def create_bcs(DVP, u_inf, boundaries, **namespace):
     return dict(bcs=[u_square, u_inlet, u_wall])
 
 
-def post_solve(t, dvp_, n, drag_list, lift_list, time_list, mu_f, verbose, ds, **namespace):
+def post_solve(t, dvp_, n, drag_list, time_list, mu_f, verbose, ds, **namespace):
     # Get deformation, velocity, and pressure
     d = dvp_["n"].sub(0, deepcopy=True)
     v = dvp_["n"].sub(1, deepcopy=True)
@@ -120,17 +120,15 @@ def post_solve(t, dvp_, n, drag_list, lift_list, time_list, mu_f, verbose, ds, *
     # Compute forces
     force = dot(sigma(v, p, d, mu_f), n)
     drag_list.append(-assemble(force[0] * ds(4)))
-    lift_list.append(-assemble(force[1] * ds(4)))
     time_list.append(t)
 
     # Print results
     if MPI.rank(MPI.comm_world) == 0 and verbose:
         print("Drag: {:e}".format(drag_list[-1]))
-        print("Lift: {:e}".format(lift_list[-1]))
 
-# def finished(drag_list, lift_list, time_list, results_folder, **namespace):
-# Store results when the computation is finished
-#    if MPI.rank(MPI.comm_world) == 0:
-#        np.savetxt(path.join(results_folder, 'Lift.txt'), lift_list, delimiter=',')
-#        np.savetxt(path.join(results_folder, 'Drag.txt'), drag_list, delimiter=',')
-#        np.savetxt(path.join(results_folder, 'Time.txt'), time_list, delimiter=',')
+
+def finished(drag_list, time_list, results_folder, **namespace):
+    # Store results when the computation is finished
+
+    np.savetxt(path.join(results_folder, 'Drag.txt'), drag_list, delimiter=',')
+    np.savetxt(path.join(results_folder, 'Time.txt'), time_list, delimiter=',')
