@@ -17,7 +17,7 @@ parameters["ghost_mode"] = "shared_facet"
 def set_problem_parameters(default_variables, **namespace):
     # Overwrite or add new variables to 'default_variables'
     s = 1  # Side length [m]
-    Re = 120  # Reynolds number [-]
+    Re = 150  # Reynolds number [-]
     u_inf = 1.0  # Free-stream flow velocity in [m/s]
     rho_f = 1.225  # Fluid density [kg/m^3]
     mu_f = rho_f * u_inf * s / Re  # Fluid dynamic viscosity [Pa.s]
@@ -26,17 +26,17 @@ def set_problem_parameters(default_variables, **namespace):
 
         # Geometric variables
         s=s,  # side length
-        f_dist=2,  # distance from the inlet
-        b_dist=2,  # distance from the bottom wall
+        # f_dist=2,  # distance from the inlet
+        # b_dist=2,  # distance from the bottom wall
         H=4,  # Total height
         R=1,  # Radius of the circle
-        L=30,  # Length of domain
+        L=22.5,  # Length of domain
         c_x=0,  # Center of the circle x-direction
         c_y=0,  # Center of the circle y-direction
 
         # Temporal variables
         T=100,  # End time [s]
-        dt=0.1,  # Time step [s]
+        dt=0.05,  # Time step [s]
         theta=0.5,  # Temporal scheme: second-order Crank-Nicolson scheme
 
         # Physical constants ('FSI 3')
@@ -46,7 +46,7 @@ def set_problem_parameters(default_variables, **namespace):
         mu_f=mu_f,  # Fluid dynamic viscosity [Pa.s]
 
         # Problem specific
-        folder="Results/aero_delta1_Re120_T100_results",  # Name of the results folder
+        folder="Results/aero_delta05_len075_Re150_T100_results",  # Name of the results folder
         solid="no_solid",  # Do not solve for the solid
         extrapolation="no_extrapolation",  # No displacement to extrapolate
 
