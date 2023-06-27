@@ -1,9 +1,9 @@
 from Mesh.mesh_generation import generate_mesh
 import subprocess
 
-mesh_flag = True  # True is create the mesh from scratch
+mesh_flag = False  # True is create the mesh from scratch
 aero_flag = True
-delta = 0.5  # 2, 1, 0.5
+delta = 1  # 2, 1, 0.5
 len_delta = 0.75  # 1, 0.75, 0.5
 
 # Mesh dimension
@@ -25,7 +25,7 @@ args_mesh = {'width': 5,
              'box_size': box_size,
              'coarse_size': coarse_size}
 
-template_mesh = '../Mesh/geometry_2d.template_geo'
+template_mesh = '../Mesh/NEW_geometry_2d.template_geo'
 
 if mesh_flag:
     # Create the mesh
@@ -36,4 +36,4 @@ if mesh_flag:
 
 # Aero simulation
 if aero_flag:
-    subprocess.call("turtleFSI --problem aero_demo", shell=True)
+    subprocess.call("turtleFSI --problem NEW_aero_demo", shell=True)

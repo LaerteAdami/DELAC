@@ -35,7 +35,7 @@ def set_problem_parameters(default_variables, **namespace):
         c_y=0,  # Center of the circle y-direction
 
         # Temporal variables
-        T=100,  # End time [s]
+        T=0.2,  # End time [s]
         dt=0.1,  # Time step [s]
         theta=0.5,  # Temporal scheme: second-order Crank-Nicolson scheme
 
@@ -46,7 +46,7 @@ def set_problem_parameters(default_variables, **namespace):
         mu_f=mu_f,  # Fluid dynamic viscosity [Pa.s]
 
         # Problem specific
-        folder="Results/TEST_FLAP",  # Name of the results folder
+        folder="Results/TEST_TEST",  # Name of the results folder
         solid="no_solid",  # Do not solve for the solid
         extrapolation="no_extrapolation",  # No displacement to extrapolate
 
@@ -83,7 +83,7 @@ def get_mesh_domain_and_boundaries(L, **namespace):
     domains.set_all(1)
 
     # Save file with boundary labels
-    # File("../Mesh/test_boundaries.pvd").write(boundaries)
+    File("../Mesh/NEW_test_boundaries.pvd").write(boundaries)
 
     return mesh, domains, boundaries
 
