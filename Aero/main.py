@@ -1,8 +1,9 @@
 from Mesh.mesh_generation import generate_mesh
 import subprocess
 
-mesh_flag = False  # True is create the mesh from scratch
+mesh_flag = False  # True to create the mesh from scratch
 aero_flag = True
+# Mesh parameters tuned in the mesh convergence analysis phase
 delta = 1  # 2, 1, 0.5
 len_delta = 0.75  # 1, 0.75, 0.5
 
@@ -23,9 +24,14 @@ args_mesh = {'width': 5,
              # Size of the mesh
              'cylinder_size': cylinder_size,
              'box_size': box_size,
-             'coarse_size': coarse_size}
+             'coarse_size': coarse_size,
+             # Flaps parameters
+             'beta': 0,
+             'flap_len': 1.5,
+             'flap_width': 0.2
+             }
 
-template_mesh = '../Mesh/NEW_geometry_2d.template_geo'
+template_mesh = '../Mesh/geometry_2d.template_geo'
 
 if mesh_flag:
     # Create the mesh
@@ -36,4 +42,4 @@ if mesh_flag:
 
 # Aero simulation
 if aero_flag:
-    subprocess.call("turtleFSI --problem NEW_aero_demo", shell=True)
+    subprocess.call("turtleFSI --problem aero_demo", shell=True)

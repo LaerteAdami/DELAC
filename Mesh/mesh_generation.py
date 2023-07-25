@@ -21,7 +21,7 @@ def generate_mesh(args, template):
     # Unrolled model
     subprocess.call(cmd + constants, shell=True)
 
-    unrolled = '../Mesh/NEW_geometry_2d.geo_unrolled'
+    unrolled = '../Mesh/geometry_2d.geo_unrolled'
 
     dim = 2
     scale = 1
@@ -29,7 +29,7 @@ def generate_mesh(args, template):
     # Create the mesh
     subprocess.call(['gmsh -format msh2 -%d -clscale %g %s' % (dim, scale, unrolled)], shell=True)
 
-    mesh_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "NEW_geometry_2d.msh")
+    mesh_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "geometry_2d.msh")
 
     root, _ = os.path.splitext(mesh_path)
 
