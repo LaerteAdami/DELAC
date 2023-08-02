@@ -32,11 +32,12 @@ def set_problem_parameters(default_variables, **namespace):
         L=22.5,  # Length of domain
         c_x=0,  # Center of the circle x-direction
         c_y=0,  # Center of the circle y-direction
-        flap=1.5,
-        flap_width=0.2,
+        flap=1,
+        flap_width=0.1,
 
         # Temporal variables
-        T=0.5,  # End time [s]
+        T=0.1,  # End time [s]
+        T_control=0.1,
         dt=0.1,  # Time step [s]
         theta=0.5,  # Temporal scheme: second-order Crank-Nicolson scheme
 
@@ -53,7 +54,8 @@ def set_problem_parameters(default_variables, **namespace):
         # lambda_s=4e5,  # Solid 1st Lame Coefficient [Pa]
 
         # Problem specific
-        folder="Results/test_obs",  # Name of the results folder
+        folder="Results/TEST",  # Name of the results folder
+        sub_folder="t1",
         # solid="no_solid",  # Do not solve for the solid
         extrapolation="biharmonic",  # No displacement to extrapolate
         extrapolation_sub_type="constrained_disp_vel",  # Biharmonic type
@@ -61,7 +63,8 @@ def set_problem_parameters(default_variables, **namespace):
 
         # Solver settings
         recompute=1,  # Compute the Jacobian matrix every iteration
-        # checkpoint_step=4
+        checkpoint_step=1,
+        save_step=1e10
     ))
     default_variables["compiler_parameters"].update({"quadrature_degree": 5})
 
@@ -70,7 +73,7 @@ def set_problem_parameters(default_variables, **namespace):
 
 def get_mesh_domain_and_boundaries(L, s, flap, flap_width, **namespace):
     # Read mesh
-    xml_file = path.join(path.dirname(path.abspath(__file__)), "../Mesh", "geometry_2d.xml")
+    xml_file = path.join(path.dirname(path.abspath(__file__)), "Mesh", "geometry_2d.xml")
     mesh = Mesh(xml_file)
 
     # Define boundaries
@@ -81,8 +84,8 @@ def get_mesh_domain_and_boundaries(L, s, flap, flap_width, **namespace):
     # Define square, neglecting flaps
     Square = AutoSubDomain(lambda x: ((near(x[1], -s / 2) or
                                        near(x[1], s / 2)) and x[0] < s / 2) or
-                                       near(x[0], -s / 2) or
-                                       near(x[0], s / 2)
+                                     near(x[0], -s / 2) or
+                                     near(x[0], s / 2)
                            )
 
     # Define and mark domains
@@ -125,12 +128,15 @@ def get_mesh_domain_and_boundaries(L, s, flap, flap_width, **namespace):
     return mesh, domains, boundaries
 
 
-def initiate(**namespace):
+def initiate(T_new, T):
     # Coordinate for sampling statistics
     probes = [[-0.5, 0],
               [-1, 0]]
 
-    # T = 2
+    if T_new != 0:
+        T = float(T_new)
+    else:
+        T = T
 
     # Lists to hold displacement, forces, and time
     # Lists to hold results
@@ -141,7 +147,7 @@ def initiate(**namespace):
 
     pres_list = []
 
-    return dict(displacement_x_list=displacement_x_list, displacement_y_list=displacement_y_list,
+    return dict(T=T, displacement_x_list=displacement_x_list, displacement_y_list=displacement_y_list,
                 drag_list=drag_list, time_list=time_list, probes=probes, pres_list=pres_list)
 
 
