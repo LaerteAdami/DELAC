@@ -8,56 +8,24 @@ cylinder_size = {0.2, Name "Mesh size on cylinder"}
 box_size = {0.5, Name "Mesh size on wall"}
 outer_length = {30, Name "Domain length"}
 coarse_size = {0.75, Name "Mesh size on outer domain"}
-beta = {0, Name "Angle"}
-flap_len = {1.5, Name "Flap length"}
-flap_width = {0.2, Name "Flap width"}
 ];
 
 // Seed the cylinder
+
 p = newp;
 Point(p) = {-square_length/2, -square_length/2, 0, cylinder_size};
-Point(p+1) = {+square_length/2 -flap_width * Sin(beta), -square_length/2, 0, cylinder_size};
-Point(p+2) = {+square_length/2 -flap_width * Sin(beta) + flap_len*Cos(beta) , -square_length/2 - flap_len*Sin(beta), 0, cylinder_size};
-Point(p+3) = {+square_length/2 + flap_len*Cos(beta), -square_length/2 + flap_width * (1 - Sin(beta)) - flap_len*Sin(beta) , 0, cylinder_size};
-Point(p+4) = {+square_length/2, -square_length/2 + flap_width * (1 - Sin(beta)), 0, cylinder_size};
-Point(p+5) = {+square_length/2, +square_length/2 - flap_width * (1 - Sin(beta)), 0, cylinder_size};
-Point(p+6) = {+square_length/2 + flap_len*Cos(beta) , +square_length/2 - flap_width * (1 - Sin(beta)) + flap_len*Sin(beta) , 0, cylinder_size};
-Point(p+7) = {+square_length/2 -flap_width * Sin(beta)+ flap_len*Cos(beta) , +square_length/2 + flap_len*Sin(beta) , 0, cylinder_size};
-Point(p+8) = {+square_length/2 -flap_width * Sin(beta), +square_length/2, 0, cylinder_size};
-Point(p+9) = {-square_length/2, +square_length/2, 0, cylinder_size};
+Point(p+1) = {-square_length/2, +square_length/2, 0, cylinder_size};
+Point(p+2) = {+square_length/2, +square_length/2, 0, cylinder_size};
+Point(p+3) = {+square_length/2, -square_length/2, 0, cylinder_size};
 
 l = newl;
 Line(l) = {p, p+1};
 Line(l+1) = {p+1, p+2};
 Line(l+2) = {p+2, p+3};
-Line(l+3) = {p+3, p+4};
-Line(l+4) = {p+4, p+5};
-Line(l+5) = {p+5, p+6};
-Line(l+6) = {p+6, p+7};
-Line(l+7) = {p+7, p+8};
-Line(l+8) = {p+8, p+9};
-Line(l+9) = {p+9, p};
+Line(l+3) = {p+3, p};
 
-cylinder[] = {l, l+1, l+2, l+3, l+4, l+5, l+6, l+7, l+8, l+9};
+cylinder[] = {l, l+1, l+2, l+3};
 Physical Line(1) = {cylinder[]};
-
-// FLAPS
-Line(l+10) = {p+4, p+1};
-flap_d[] = {l+1, l+2, l+3, l+10};
-flap_down = newll;
-Line Loop(flap_down) = {flap_d[]};
-s = news;
-Plane Surface(s) = {flap_down};
-Physical Surface(1) = {s};
-
-
-Line(l+11) = {p+8, p+5};
-flap_u[] = {l+5, l+6, l+7, l+11};
-flap_up = newll;
-Line Loop(flap_up) = {flap_u[]};
-s = news;
-Plane Surface(s) = {flap_up};
-Physical Surface(1) += {s};
 
 // The chanel
 p = newp;
@@ -90,7 +58,7 @@ Line Loop(inner) = {cylinder[]};
 
 s = news;
 Plane Surface(s) = {inner, outer};
-Physical Surface(1) += {s};
+Physical Surface(1) = {s};
 
 // Outer Domain
 p = newp;
@@ -127,13 +95,6 @@ s = news;
 Plane Surface(s) = {outer, outer_outer};
 Physical Surface(1) += {s};
 
-// solid
-//solid = newll;
-//Line Loop(solid) = {-cylinder[]};
-//s = news;
-//Plane Surface(s) = {solid};
-//Physical Surface(1) += {s};
-//Physical Line(1) = {cylinder[]};
 
 //Characteristic Length{cylinder[]} = cylinder_size;
 //Characteristic Length{cframe[]} = box_size;

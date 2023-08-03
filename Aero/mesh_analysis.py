@@ -3,7 +3,7 @@ import scipy.signal
 from scipy.fft import fft
 import numpy as np
 
-exp = 5
+exp = 7
 plot_flag = True
 plot_freq = False
 
@@ -60,8 +60,9 @@ elif exp == 5: # Different density
                 "test_solid_6_disp_vel",
                 "test_solid_7_disp_vel",
                 "test_solid_8_disp_vel"]
-
-    lim = [int(80 / 0.1), int(80 / 0.1), int(80 / 0.1), int(80 / 0.1), int(80 / 0.1), int(80 / 0.1)]
+    lim_time = 80
+    lim = [int(lim_time / 0.1), int(lim_time / 0.1), int(lim_time / 0.1),
+           int(lim_time / 0.1), int(lim_time / 0.1), int(lim_time / 0.1)]
 
     labels = ["No solid",
               "Rho 2e2", "Rho 2e3", "Rho 2e4","Rho 2e5","Rho 2e6"]

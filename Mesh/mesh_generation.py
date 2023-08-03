@@ -2,7 +2,7 @@ import os
 import subprocess
 
 
-def generate_mesh(args, template):
+def create_mesh(args, template):
 
     output = template
 
@@ -21,7 +21,7 @@ def generate_mesh(args, template):
     # Unrolled model
     subprocess.call(cmd + constants, shell=True)
 
-    unrolled = '../Mesh/geometry_2d.geo_unrolled'
+    unrolled = 'Mesh/geometry_2d.geo_unrolled'
 
     dim = 2
     scale = 1
