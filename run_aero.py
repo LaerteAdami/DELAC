@@ -62,9 +62,10 @@ def set_problem_parameters(default_variables, **namespace):
         bc_ids=[1, 2, 3, 4],  # Ids of makers for the mesh extrapolation
 
         # Solver settings
-        recompute=1,  # Compute the Jacobian matrix every iteration
-        checkpoint_step=1,
-        save_step=1e10
+        recompute=2,  # Compute the Jacobian matrix every iteration
+        checkpoint_step=1e10,
+        save_step=1e10,
+        verbose=True
     ))
     default_variables["compiler_parameters"].update({"quadrature_degree": 5})
 
@@ -130,8 +131,22 @@ def get_mesh_domain_and_boundaries(L, s, flap, flap_width, **namespace):
 
 def initiate(T_new, T):
     # Coordinate for sampling statistics
-    probes = [[-0.5, 0],
-              [-1, 0]]
+    probes = [[2, -0.5],    # 1
+              [2, 0],       # 2
+              [2, 0.5],     # 3
+              [2.5, -0.5],  # 4
+              [2.5, 0],     # 5
+              [2.5, 0.5],   # 6
+              [3, -0.5],    # 7
+              [3, 0],       # 8
+              [3, 0.5],     # 9
+              [3.5, -0.5],  # 10
+              [3.5, 0],     # 11
+              [3.5, 0.5],   # 12
+              [4, -0.5],    # 13
+              [4, 0],       # 14
+              [4, 0.5]      # 15
+              ]
 
     if T_new != 0:
         T = float(T_new)
