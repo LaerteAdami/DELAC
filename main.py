@@ -34,7 +34,7 @@ env = AeroEnv(generate_mesh,
               n_pressure,
               train_agent)
 
-episode_steps = 4
+episode_steps = 2
 
 #  env = TimeLimit(env, max_episode_steps=episode_steps)
 env = TransformObservation(env, lambda x: 2*((x - min(x)) / (max(x) - min(x))) - 1)
@@ -43,8 +43,8 @@ env = TransformObservation(env, lambda x: 2*((x - min(x)) / (max(x) - min(x))) -
 
 start_time = time.time()
 # Model definition
-model = PPO("MlpPolicy", env, verbose=2, batch_size=4,  n_steps=episode_steps)
-model.learn(total_timesteps=int(1e3), progress_bar=True)
+model = PPO("MlpPolicy", env, verbose=2, batch_size=2,  n_steps=episode_steps)
+model.learn(total_timesteps=int(1e2), progress_bar=True)
 model.save("test")
 print("Total time: {}".format(time.time() - start_time))
 
