@@ -19,6 +19,7 @@ class AeroEnv(gym.Env):
         self.n_pressure = n_pressure
         self.train_agent = train_agent
 
+
         # Parameters for reward
         self.p1 = 0.845
         self.p2 = 10000
@@ -66,7 +67,7 @@ class AeroEnv(gym.Env):
         observations = self._get_obs()
         info = self._get_info()
 
-        create_history(self.restart_folder)
+        # create_history(self.restart_folder)
 
         return observations, info
 
@@ -77,11 +78,11 @@ class AeroEnv(gym.Env):
         T_control = self.T_startup + self.counter * self.dt_control
 
         # Set control parameter from action
-        rho = 10 ** (action[0]*1.5 + 4.5)
+        rho = 10 ** (action[0] * 1.5 + 4.5)
 
         # Perform aero step
         aero_step(self.restart_folder, rho, T_control, self.train_agent)
-        update_history(self.restart_folder)
+        # update_history(self.restart_folder)
 
         # Compute CD
         cd = get_cd(self.restart_folder)
@@ -94,12 +95,12 @@ class AeroEnv(gym.Env):
             self.u = 0
         self.old_action = action  # Update old action with current action
 
-        reward = 0.5 * cd**2 - self.p1 / self.p2 * (1 - self.p2 ** (self.u / self.u_max))
+        reward = 0.5 * cd ** 2 - self.p1 / self.p2 * (1 - self.p2 ** (self.u / self.u_max))
         self.drag.append(cd)
         self.r.append(reward)
 
         # returns the 5-tuple (observation, reward, terminated, truncated, info)
-        if self.T_startup + (self.counter+1) * self.dt_control >= self.T_max:
+        if self.T_startup + (self.counter + 1) * self.dt_control >= self.T_max:
             print("##########################")
             print("####### TRUNCATED  #######")
             print("##########################")
@@ -119,8 +120,10 @@ class AeroEnv(gym.Env):
 
     def _get_info(self):
         return {"T_startup": self.T_startup,
-                "T": self.T,
-                "A": self.a,
-                "CD": self.drag,
-                "R": self.r}
-                # "TimeLimit.truncated": self.truncated}
+                # "T": self.T,
+                # "A": self.a,
+                # "CD": self.drag,
+                # "R": self.r}
+                # "TimeLimit.truncated": self.truncated
+                }
+

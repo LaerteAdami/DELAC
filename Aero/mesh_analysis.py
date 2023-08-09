@@ -3,7 +3,7 @@ import scipy.signal
 from scipy.fft import fft
 import numpy as np
 
-exp = 7
+exp = 5
 plot_flag = True
 plot_freq = False
 
