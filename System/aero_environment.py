@@ -19,6 +19,7 @@ class AeroEnv(gym.Env):
         self.n_pressure = n_pressure
         self.train_agent = train_agent
 
+
         # Parameters for reward
         self.p1 = 0.845
         self.p2 = 10000
@@ -118,10 +119,11 @@ class AeroEnv(gym.Env):
         return get_observations(self.restart_folder, self.n_probes, self.n_pressure)
 
     def _get_info(self):
-        return {"T_startup": self.T_startup
+        return {"T_startup": self.T_startup,
                 # "T": self.T,
                 # "A": self.a,
                 # "CD": self.drag,
                 # "R": self.r}
                 # "TimeLimit.truncated": self.truncated
                 }
+
