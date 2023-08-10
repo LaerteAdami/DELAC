@@ -19,7 +19,6 @@ class AeroEnv(gym.Env):
         self.n_pressure = n_pressure
         self.train_agent = train_agent
 
-
         # Parameters for reward
         self.p1 = 0.845
         self.p2 = 10000
@@ -126,4 +125,3 @@ class AeroEnv(gym.Env):
                 # "R": self.r}
                 # "TimeLimit.truncated": self.truncated
                 }
-
