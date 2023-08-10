@@ -65,7 +65,7 @@ def set_problem_parameters(default_variables, **namespace):
         recompute=2,  # Compute the Jacobian matrix every iteration
         checkpoint_step=5,#1e10,
         save_step=1e10,
-        verbose=True
+        verbose=False
     ))
     default_variables["compiler_parameters"].update({"quadrature_degree": 5})
 
