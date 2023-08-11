@@ -64,20 +64,10 @@ def aero_step(restart_folder, rho, T_control, train_agent):
 
 
 def aero_test():
-    folder = "../Aero/Results/test_restart/t1"
-    restart_folder = "../Aero/Results/test_restart/t1"
-    T_startup = 0.5
-    dt_control = 0.5
-    counter = 1
-    T_control = T_startup + counter * dt_control
-
+    folder = "../Aero/Results/test_no_solid/t1"
+    T_startup = 100
     subprocess.call("turtleFSI --problem run_aero -T {} "
                     " --folder {} "
-                    "--new-arguments T_control={}".format(T_startup, folder, 0), shell=True)
+                    "--new-arguments T_control={} "
+                    "train_agent={}".format(T_startup, folder, 0, True), shell=True)
 
-    create_history(restart_folder)
-    subprocess.call("turtleFSI --problem run_aero "
-                    "--restart-folder {} "
-                    "--new-arguments T_control={}".format(restart_folder, T_control), shell=True)
-
-    update_history(restart_folder)
