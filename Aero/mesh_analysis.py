@@ -54,7 +54,7 @@ elif exp == 4:  # Final comparison
 
 elif exp == 5: # Different density
 
-    exp_name = ["aero_delta1_len075_Re150_T100_results",
+    exp_name = ["test_no_solid",
                 "test_solid_4_disp_vel",
                 "test_solid_5_disp_vel",
                 "test_solid_6_disp_vel",
@@ -66,7 +66,7 @@ elif exp == 5: # Different density
 
     labels = ["No solid",
               "Rho 2e2", "Rho 2e3", "Rho 2e4","Rho 2e5","Rho 2e6"]
-    dt = [0.1, 0.1, 0.1, 0.1, 0.1,0.1, 0.1]
+    dt = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 
     colors = ["royalblue", "red", "royalblue", "green", "black"]
     linestyles = ["-", "-", "-", "-", "-", "-"]
