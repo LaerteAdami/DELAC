@@ -67,7 +67,10 @@ class AeroEnv(gym.Env):
         self.T_startup = round(self.np_random.uniform(self.T_startup * 0.9, self.T_startup * 1.1, ), 1)
         if not self.train_agent:
             self.T.append(self.T_startup)
-            self.a.append(self.old_action[0])  # Action list
+            if self.dqn_flag:
+                self.a.append(self.old_action)  # Action list
+            else:
+                self.a.append(self.old_action[0])  # Action list
             self.drag.append(10)  # Drag list
             self.r.append(10)  # Reward list
 
@@ -86,7 +89,10 @@ class AeroEnv(gym.Env):
         T_control = self.T_startup + self.counter * self.dt_control
         if not self.train_agent:
             self.T.append(T_control)
-            self.a.append(action[0])
+            if self.dqn_flag:
+                self.a.append(self.old_action)  # Action list
+            else:
+                self.a.append(self.old_action[0])  # Action list
 
         # Set control parameter from action
         if self.dqn_flag:

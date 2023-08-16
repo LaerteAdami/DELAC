@@ -52,3 +52,8 @@ def get_cd(folder):
         drag.append(float(line))
 
     return np.mean(drag)
+
+
+def write_result(name, result):
+
+    np.savetxt(name, result, delimiter=", ", fmt='% s')
