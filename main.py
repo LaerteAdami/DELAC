@@ -19,7 +19,7 @@ agent_name = "System/Agents/" + exp_name
 
 # Parameters
 generate_mesh = False
-template_mesh = 'Mesh/geometry_2d.template_geo'
+template_mesh = 'Mesh/geometry_2d_FLAPS_SOLID.template_geo'
 T_startup = 1  # 40
 dt_control = 1
 T_max = 2  # 240  # 340
@@ -86,8 +86,11 @@ else:
     T = env.T
     D = env.drag
     a = env.a
+    r = env.r
     write_result("System/Results/"+exp_name+"_T.csv", T)
     write_result("System/Results/"+exp_name+"_D.csv", D)
     write_result("System/Results/"+exp_name+"_a.csv", a)
+    write_result("System/Results/"+exp_name+"_r.csv", r)
+
 
 print("Total time: {}".format(time.time() - start_time))

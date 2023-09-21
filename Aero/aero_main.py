@@ -16,7 +16,7 @@ box_size = 0.5 * delta
 coarse_size = 1 * delta
 
 
-# template_mesh = '../Mesh/geometry_2d.template_geo'
+# template_mesh = '../Mesh/geometry_2d_FLAPS_SOLID.template_geo'
 
 
 def generate_mesh(template_mesh):
@@ -64,10 +64,12 @@ def aero_step(restart_folder, rho, T_control, train_agent):
 
 
 def aero_test():
-    folder = "../Aero/Results/test_no_solid/t1"
-    T_startup = 100
-    subprocess.call("turtleFSI --problem run_aero -T {} "
+    folder = "../Aero/Results/TESTTESTTEST/t1"
+    T_startup = 1
+    #subprocess.call("turtleFSI --problem test_run_aero -T {} "
+    #                " --folder {} ".format(T_startup, folder), shell=True)
+
+    subprocess.call("turtleFSI --problem test_run_aero -T {} "
                     " --folder {} "
                     "--new-arguments T_control={} "
                     "train_agent={}".format(T_startup, folder, 0, True), shell=True)
-
