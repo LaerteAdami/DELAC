@@ -9,8 +9,8 @@ box_size = {0.5, Name "Mesh size on wall"}
 outer_length = {30, Name "Domain length"}
 coarse_size = {0.75, Name "Mesh size on outer domain"}
 beta = {0, Name "Angle"}
-flap_len = {1, Name "Flap length"}
-flap_width = {0.1, Name "Flap width"}
+flap_len = {1.2, Name "Flap length"}
+flap_width = {0.2, Name "Flap width"}
 ];
 
 // Seed the cylinder
