@@ -1,6 +1,5 @@
 from Mesh.mesh_generation import create_mesh
 import subprocess
-from utils import *
 
 # Mesh parameters tuned in the mesh convergence analysis phase
 delta = 1  # 2, 1, 0.5
@@ -16,10 +15,10 @@ box_size = 0.5 * delta
 coarse_size = 1 * delta
 
 
-# template_mesh = '../Mesh/geometry_2d_FLAPS_SOLID.template_geo'
-
-
 def generate_mesh(template_mesh):
+    """
+    Generates the mesh given the parameters (same parameters of geometry_2d.template_geo)
+    """
     args_mesh = {'width': 5,
                  'length': length,
                  'bottom_distance': 2.5,
@@ -46,6 +45,10 @@ def generate_mesh(template_mesh):
 
 
 def aero_startup(T_startup, folder, train_agent):
+    """
+    Start up procedure at the beginning of every episode
+    """
+
     subprocess.call("turtleFSI --problem run_aero -T {} "
                     " --folder {} "
                     "--new-arguments T_control={} "
@@ -56,6 +59,9 @@ def aero_startup(T_startup, folder, train_agent):
 
 
 def aero_step(restart_folder, rho, T_control, train_agent):
+    """
+    Calls the aerodynamic solver between two actions
+    """
     subprocess.call("turtleFSI --problem run_aero "
                     "--restart-folder {} "
                     "--rho-s {} "
@@ -66,7 +72,7 @@ def aero_step(restart_folder, rho, T_control, train_agent):
 def aero_test():
     folder = "../Aero/Results/TESTTESTTEST/t1"
     T_startup = 1
-    #subprocess.call("turtleFSI --problem test_run_aero -T {} "
+    # subprocess.call("turtleFSI --problem test_run_aero -T {} "
     #                " --folder {} ".format(T_startup, folder), shell=True)
 
     subprocess.call("turtleFSI --problem test_run_aero -T {} "

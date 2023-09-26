@@ -1,5 +1,8 @@
 """
 Problem file for running the 2D cylinder problem with control flaps
+
+The main structure is taken from https://github.com/KVSlab/turtleFSI/blob/master/turtleFSI/problems/turtle_demo.py
+It has been modified for the problem considered
 """
 
 from dolfin import *
@@ -10,9 +13,6 @@ import numpy as np
 from mpi4py import MPI as pyMPI
 
 parameters["ghost_mode"] = "shared_facet"
-
-
-# _compiler_parameters = dict(parameters["form_compiler"])
 
 
 def set_problem_parameters(default_variables, **namespace):
@@ -26,20 +26,19 @@ def set_problem_parameters(default_variables, **namespace):
     default_variables.update(dict(
 
         # Geometric variables
-        s=s,  # side length
+        s=s,  # Side length
         H=4,  # Total height
-        R=1,  # Radius of the circle
         L=22.5,  # Length of domain
-        c_x=0,  # Center of the circle x-direction
-        c_y=0,  # Center of the circle y-direction
-        flap=1,
-        flap_width=0.1,
+        c_x=0,  # Center of the square x-direction
+        c_y=0,  # Center of the square y-direction
+        flap=1,  # Length of the flap
+        flap_width=0.1,  # Width of the flap
 
         # Temporal variables
         T=0.1,  # End time [s]
-        T_control=0.1,
-        dt=0.1,  # Time step [s]
-        theta=0.5,  # Temporal scheme: second-order Crank-Nicolson scheme
+        T_control=0.1,  # Time interval of control [s]
+        dt=0.1,  # Numerical time step [s]
+        theta=0.5,  # Temporal scheme: second-order CN scheme
 
         # Fluid physical constants
         u_inf=u_inf,  # Inlet velocity: 1.0 [m/s]
@@ -49,21 +48,17 @@ def set_problem_parameters(default_variables, **namespace):
 
         # Solid physical constants
         rho_s=5e5,  # Solid density[kg/m3]
-        # nu_s=0.281,  # Solid Poisson ratio [-]
-        # mu_s=1E3,  # Shear modulus, CSM3: 0.5E6 [Pa]
-        # lambda_s=4e5,  # Solid 1st Lame Coefficient [Pa]
 
         # Problem specific
-        folder="Results/TEST",  # Name of the results folder
-        sub_folder="t1",
-        # solid="no_solid",  # Do not solve for the solid
-        extrapolation="biharmonic",  # No displacement to extrapolate
-        extrapolation_sub_type="constrained_disp_vel",  # Biharmonic type
+        folder="Results/TEST",  # Name of the default results folder
+        sub_folder="t1",  # Name of the default results sub-folder
+        extrapolation="biharmonic",  # Bi-harmonic extrapolation of displacements
+        extrapolation_sub_type="constrained_disp_vel",  # Bi-harmonic type
         bc_ids=[1, 2, 3, 4],  # Ids of makers for the mesh extrapolation
 
         # Solver settings
         recompute=2,  # Compute the Jacobian matrix every iteration
-        checkpoint_step=5,#1e10,
+        checkpoint_step=5,
         save_step=1e10,
         verbose=False
     ))
@@ -89,7 +84,7 @@ def get_mesh_domain_and_boundaries(L, s, flap, flap_width, **namespace):
                                      near(x[0], s / 2)
                            )
 
-    # Define and mark domains
+    # Define flaps boundaries
     Flaps = AutoSubDomain(lambda x: near(x[0], s / 2 + flap) or
                                     (near(x[1], s / 2) and s / 2 <= x[0] <= s / 2 + flap) or
                                     (near(x[1], s / 2 - flap_width) and s / 2 <= x[0] <= s / 2 + flap) or
@@ -97,6 +92,7 @@ def get_mesh_domain_and_boundaries(L, s, flap, flap_width, **namespace):
                                     (near(x[1], - s / 2) and s / 2 <= x[0] <= s / 2 + flap)
                           )
 
+    # Define walls between the square and the flaps
     Flaps_wall_up = AutoSubDomain(lambda x: (near(x[0], s / 2) and (s / 2 - flap_width) <= x[1] <= s / 2))
     Flaps_wall_down = AutoSubDomain(lambda x: near(x[0], s / 2) and -s / 1 <= x[1] <= (-s / 2 + flap_width))
 
@@ -105,15 +101,15 @@ def get_mesh_domain_and_boundaries(L, s, flap, flap_width, **namespace):
     boundaries = MeshFunction("size_t", mesh, mesh.geometry().dim() - 1)
     boundaries.set_all(0)
     All_boundaries.mark(boundaries, 7)
-    Inlet.mark(boundaries, 1)
-    Walls.mark(boundaries, 2)
-    Outlet.mark(boundaries, 3)
+    Inlet.mark(boundaries, 1)  # Inlet
+    Walls.mark(boundaries, 2)  # Up and down walls
+    Outlet.mark(boundaries, 3)  # Outlet
     Square.mark(boundaries, 4)  # Square
     Flaps.mark(boundaries, 5)  # Flaps
     Flaps_wall_up.mark(boundaries, 6)  # Flap wall
     Flaps_wall_down.mark(boundaries, 6)  # Flap wall
 
-    # Define and mark domains
+    # Define flap domains
     Flaps_up = AutoSubDomain(lambda x: (s / 2 + flap >= x[0] >= s / 2 >= x[1] >= s / 2 - flap_width))
     Flaps_down = AutoSubDomain(lambda x: s / 2 <= x[0] <= s / 2 + flap and -s / 2 <= x[1] <= -s / 2 + flap_width)
 
@@ -131,21 +127,28 @@ def get_mesh_domain_and_boundaries(L, s, flap, flap_width, **namespace):
 
 def initiate(T_new, T):
     # Coordinate for sampling statistics
-    probes = [[2, -0.5],    # 1
-              [2, 0],       # 2
-              [2, 0.5],     # 3
+    # SELECT THE CORRECT CASE ACCORDING TO LINE 26 OF MAIN.PY
+    probes = [[2, -0.5],  # 1
+              [2, 0],  # 2
+              [2, 0.5],  # 3
               [2.5, -0.5],  # 4
-              [2.5, 0],     # 5
-              [2.5, 0.5],   # 6
-              [3, -0.5],    # 7
-              [3, 0],       # 8
-              [3, 0.5],     # 9
+              [2.5, 0],  # 5
+              [2.5, 0.5],  # 6
+              [3, -0.5],  # 7
+              [3, 0],  # 8
+              [3, 0.5],  # 9
               [3.5, -0.5],  # 10
-              [3.5, 0],     # 11
-              [3.5, 0.5],   # 12
-              [4, -0.5],    # 13
-              [4, 0],       # 14
-              [4, 0.5]      # 15
+              [3.5, 0],  # 11
+              [3.5, 0.5],  # 12
+              [4, -0.5],  # 13
+              [4, 0],  # 14
+              [4, 0.5]  # 15
+              ]
+    probes = [[2, 0],  # 1
+              [2.5, 0],  # 2
+              [3, 0],  # 3
+              [3.5, 0],  # 4
+              [4, 0]  # 5
               ]
 
     if T_new != 0:
@@ -153,8 +156,7 @@ def initiate(T_new, T):
     else:
         T = T
 
-    # Lists to hold displacement, forces, and time
-    # Lists to hold results
+    # Lists to hold results - displacements along x and y, drag, time and pressures
     displacement_x_list = []
     displacement_y_list = []
     drag_list = []
@@ -167,17 +169,12 @@ def initiate(T_new, T):
 
 
 def create_bcs(DVP, u_inf, boundaries, extrapolation_sub_type, **namespace):
-    no_slip = (0.0, 0.0)
+    no_slip = (0.0, 0.0)  # No penetration, no slip condition
     # Fluid velocity conditions
     u_inlet = DirichletBC(DVP.sub(1), Constant((u_inf, 0)), boundaries, 1)
     u_wall = DirichletBC(DVP.sub(1), Constant((u_inf, 0)), boundaries, 2)
     u_square = DirichletBC(DVP.sub(1), no_slip, boundaries, 4)
     u_flaps_wall = DirichletBC(DVP.sub(1), no_slip, boundaries, 6)
-
-    # u_flaps = DirichletBC(DVP.sub(1), (no_slip), boundaries, 5)
-
-    # Pressure Conditions
-    # p_out = DirichletBC(DVP.sub(2), 0, boundaries, 3)
 
     bcs = [u_square, u_inlet, u_wall, u_flaps_wall]
 
@@ -203,14 +200,9 @@ def create_bcs(DVP, u_inf, boundaries, extrapolation_sub_type, **namespace):
 
     return dict(bcs=bcs)
 
-
 ################################################################################
-# the function mpi4py_comm and peval are used to overcome FEniCS limitation of
-# evaluating functions at a given mesh point in parallel.
-# https://fenicsproject.discourse.group/t/problem-with-evaluation-at-a-point-in
-# -parallel/1188
-
-
+# The next two methods are taken as they are from
+# https://github.com/KVSlab/turtleFSI/blob/master/turtleFSI/problems/turtle_demo.py
 def mpi4py_comm(comm):
     """Get mpi4py communicator"""
     try:
@@ -233,7 +225,6 @@ def peval(f, x):
     return yglob
 
 
-################################################################################
 def post_solve(t, dvp_, n, drag_list, time_list, probes, pres_list, mu_f, verbose, ds, **namespace):
     # Get deformation, velocity, and pressure
     d = dvp_["n"].sub(0, deepcopy=True)

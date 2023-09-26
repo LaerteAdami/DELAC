@@ -1,3 +1,7 @@
+# This script is taken from:
+# https://github.com/jerabaul29/Cylinder2DFlowControlDRL/blob/master/Cylinder2DFlowControlWithRL/generate_msh.py
+# including minor changes to adapt it to this problem
+
 import os
 import subprocess
 
